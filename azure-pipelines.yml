@@ -51,10 +51,10 @@ stages:
             artifact: warfile
 
           - script: |
-              echo "WAR files available:"
-              ls -l $(Pipeline.Workspace)/warfile
+              WAR_FILE=$(find $(Pipeline.Workspace) -name "*.war" | head -1)
 
-              cp $(Pipeline.Workspace)/warfile/webapp.war \
-                 /opt/tomcat/webapps/
+              echo "WAR file found: $WAR_FILE"
+
+              cp "$WAR_FILE" /opt/tomcat/webapps/
 
             displayName: Deploy WAR
