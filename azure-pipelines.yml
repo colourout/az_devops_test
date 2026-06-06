@@ -37,8 +37,10 @@ stages:
 
   - deployment: DeployToTomcat
 
-    environment: production
-
+    environment:
+      name: production
+      resourceName: azuredevopshosting
+      resourceType: VirtualMachine
     strategy:
       runOnce:
         deploy:
