@@ -47,16 +47,15 @@ stages:
           steps:
 
           - script: |
-              echo "Current User:"
-              whoami
+              WAR_FILE=$(find $(Pipeline.Workspace) -name "*.war" | head -1)
 
-              echo "Hostname:"
-              hostname
+              echo "WAR file found: $WAR_FILE"
 
-              echo "Current Directory:"
-              pwd
+              rm -rf /opt/tomcat/webapps/webapp
+              rm -f /opt/tomcat/webapps/webapp.war
 
-              echo "Tomcat Check:"
-              ls -ld /opt/tomcat || echo "Tomcat Not Found"
+              cp "$WAR_FILE" /opt/tomcat/webapps/
 
-            displayName: Verify Deployment Target
+              echo "Deployment completed."
+
+            displayName: Deploy WAR
