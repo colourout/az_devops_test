@@ -40,21 +40,21 @@ stages:
     environment: production
 
     strategy:
-
       runOnce:
-
         deploy:
-
           steps:
 
-          - download: current
-            artifact: warfile
-
           - script: |
-              WAR_FILE=$(find $(Pipeline.Workspace) -name "*.war" | head -1)
+              echo "Current User:"
+              whoami
 
-              echo "WAR file found: $WAR_FILE"
+              echo "Hostname:"
+              hostname
 
-              cp "$WAR_FILE" /opt/tomcat/webapps/
+              echo "Current Directory:"
+              pwd
 
-            displayName: Deploy WAR
+              echo "Tomcat Check:"
+              ls -ld /opt/tomcat || echo "Tomcat Not Found"
+
+            displayName: Verify Deployment Target
