@@ -1,26 +1,60 @@
-trigger: none
+trigger:
+- master
 
 stages:
 
-- stage: Deploy
+- stage: Build
 
   jobs:
 
-  - deployment: TestEnvironment
+  - job: BuildJob
+
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
+
+    - task: Maven@3
+      inputs:
+        mavenPomFile: 'pom.xml'
+        goals: 'package'
+
+    - task: CopyFiles@2
+      inputs:
+        Contents: '**/*.war'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'warfile'
+
+- stage: Deploy
+
+  dependsOn: Build
+
+  jobs:
+
+  - deployment: DeployToTomcat
 
     environment: production
 
     strategy:
+
       runOnce:
+
         deploy:
 
           steps:
 
-          - script: |
-              echo "Deployment reached VM successfully"
-              whoami
-              hostname
-              pwd
-              ls -ld /opt/tomcat
+          - download: current
+            artifact: warfile
 
-            displayName: Test Environment
+          - script: |
+              echo "WAR files available:"
+              ls -l $(Pipeline.Workspace)/warfile
+
+              cp $(Pipeline.Workspace)/warfile/webapp.war \
+                 /opt/tomcat/webapps/
+
+            displayName: Deploy WAR
