@@ -59,3 +59,31 @@ stages:
               echo "Deployment completed."
 
             displayName: Deploy WAR
+
+- stage: AutomationTest
+
+  displayName: Run Automation Tests
+
+  dependsOn: Deploy
+
+  jobs:
+  - deployment: SeleniumTests
+
+    environment:
+      name: production
+      resourceType: VirtualMachine
+      resourceName: azuredevopshosting
+
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+
+          - script: |
+              cd /home/devopsuser/az_devops_automation_test
+
+              mvn clean test \
+              -Dtest=BrowserTest \
+              -Dapp.url=http://20.198.92.89:8080/webapp/
+
+            displayName: Run Selenium Tests            
